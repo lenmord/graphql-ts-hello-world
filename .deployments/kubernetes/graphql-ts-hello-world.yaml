@@ -1,0 +1,128 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: graphql-ts-hello-world
+  namespace: {{ .Values.namespace }}
+  labels:
+    ad-app: graphql-ts-hello-world
+  annotations:
+    appdirect.com/metadata.owner: "ui-platform@appdirect.com"
+    appdirect.com/metadata.slack: "#ui-platform"
+    appdirect.com/ingress.mgmt: "true"
+    appdirect.com/ingress.name: graphql-ts-hello-world
+    getambassador.io/config: |
+      ---
+      apiVersion: ambassador/v0
+      kind: Mapping
+      name: graphql-ts-hello-world
+      prefix: /api/v1/graphql-ts-hello-world/graphql
+      rewrite: /api/v1/graphql-ts-hello-world/graphql
+      service: graphql-ts-hello-world:80
+      timeout_ms: 30000
+spec:
+  selector:
+    ad-app: graphql-ts-hello-world
+  ports:
+    - name: http-port
+      port: 80
+      targetPort: http-port
+    - name: container-port
+      port: 3434
+      targetPort: http-port
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: graphql-ts-hello-world-preview
+  namespace: {{ .Values.namespace }}
+  labels:
+    ad-app: graphql-ts-hello-world
+  annotations:
+    appdirect.com/metadata.owner: "ui-platform@appdirect.com"
+    appdirect.com/metadata.slack: "#ui-platform"
+spec:
+  selector:
+    ad-app: graphql-ts-hello-world
+  ports:
+    - name: http-port
+      port: 80
+      targetPort: http-port
+    - name: container-port
+      port: 3434
+      targetPort: http-port
+
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: graphql-ts-hello-world
+  namespace: {{ .Values.namespace }}
+  labels:
+    ad-app: graphql-ts-hello-world
+  annotations:
+    appdirect.com/metadata.owner: "ui-platform@appdirect.com"
+    appdirect.com/metadata.slack: "#ui-platform"
+spec:
+  revisionHistoryLimit: 3
+  strategy:
+    blueGreen:
+      activeService: graphql-ts-hello-world
+      previewService: graphql-ts-hello-world-preview
+{{ if .Values.smoketest }}
+      prePromotionAnalysis:
+        templateName: graphql-ts-hello-world-smoke
+{{ end }}
+      scaleDownDelaySeconds: 15
+  replicas: {{ .Values.replicas }}
+  progressDeadlineSeconds: 300
+  selector:
+    matchLabels:
+      ad-app: graphql-ts-hello-world
+  template:
+    metadata:
+      labels:
+        ad-app: graphql-ts-hello-world
+    spec:
+      containers:
+        - name: graphql-ts-hello-world
+          image: docker.appdirect.tools/graphql-ts-hello-world/graphql-ts-hello-world:{{ .Values.imageVersion }}
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsNonRoot: true
+            {{ if not .Values.cluster.OpenShift }}
+            runAsUser: 1279
+            {{ end }}
+          resources:
+            requests:
+              cpu: 125m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          ports:
+            - containerPort: 3434
+              name: http-port
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3434
+              scheme: HTTP
+            initialDelaySeconds: 30
+            failureThreshold: 5
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3434
+              scheme: HTTP
+            initialDelaySeconds: 30
+            failureThreshold: 5
+            timeoutSeconds: 10
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: ZIPKIN_BASE_URL
+              value: "http://zipkin-collector.tracing:9411"

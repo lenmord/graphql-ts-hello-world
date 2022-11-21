@@ -1,0 +1,2 @@
+namespace: appdirect
+replicas: 2

@@ -1,0 +1,41 @@
+{{ if .Values.smoketest }}
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: graphql-ts-hello-world-smoke
+  namespace: {{ .Values.namespace }}
+  labels:
+    ad-app: graphql-ts-hello-world
+  annotations:
+    appdirect.com/metadata.owner: "ui-platform@appdirect.com"
+    appdirect.com/metadata.slack: "#ui-platform"
+spec:
+  metrics:
+    - name: smoke
+      provider:
+        job:
+          spec:
+            backoffLimit: 0
+            activeDeadlineSeconds: 300
+            template:
+              spec:
+                restartPolicy: Never
+                containers:
+                  - name: graphql-ts-hello-world-smoke
+                    image: docker.appdirect.tools/graphql-ts-hello-world/graphql-ts-hello-world-smoke:{{ .Values.imageVersion }}
+                    resources:
+                      requests:
+                        cpu: 250m
+                        memory: 256Mi
+                      limits:
+                        cpu: 500m
+                        memory: 512Mi
+                    securityContext:
+                      runAsNonRoot: true
+                    {{ if not .Values.cluster.OpenShift }}
+                      runAsUser: 1000
+                    {{ end }}
+                    env:
+                      - name: BASE_URL
+                        value: http://graphql-ts-hello-world-preview
+{{ end }}

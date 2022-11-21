@@ -1,0 +1,23 @@
+notification:
+  slack_channel: uip-conductorbot
+release:
+  workflow:
+    path: github.com/AppDirect/cd-workflows//bluegreen-release.yaml?ref=master
+  triggers:
+    - filter: ^v\d+\.\d+\.\d+$
+      parameters:
+        - name: deploy-only-test-repos
+          # clusters with smoketest goes here
+          value: |
+            [
+              "manifests-shared.test.us-east-1"
+            ]
+        - name: deploy-only-repos
+          value: |
+            [
+              "manifests-azr.test.shared.use1",
+              "manifests-shared.load.us-east-1",
+              "manifests-swisscom.test.appuioch",
+              "manifests-dcs.swisscom.test.euch",
+              "manifests-telstra.test.ap-south-2"
+            ]

@@ -1,0 +1,40 @@
+version: "3.4"
+
+services:
+  graphql-ts-hello-world-test:
+    build:
+      context: .
+      target: test
+      args:
+        version: ${VERSION:-patch}
+    image: docker.appdirect.tools/graphql-ts-hello-world/graphql-ts-hello-world-test:${VERSION:-local}
+
+  graphql-ts-hello-world-transpile:
+    build:
+      context: .
+      target: transpile
+      args:
+        version: ${VERSION:-patch}
+    image: docker.appdirect.tools/graphql-ts-hello-world/graphql-ts-hello-world-transpile:${VERSION:-local}
+
+  graphql-ts-hello-world:
+    build:
+      context: .
+      target: production
+      args:
+        version: ${VERSION:-patch}
+    image: docker.appdirect.tools/graphql-ts-hello-world/graphql-ts-hello-world:${VERSION:-local}
+    ports:
+      - "3434"
+    environment:
+      NODE_ENV: production
+
+  graphql-ts-hello-world-smoke:
+    build:
+      context: .
+      target: smoke
+      args:
+        version: ${VERSION:-patch}
+    image: docker.appdirect.tools/graphql-ts-hello-world/graphql-ts-hello-world-smoke:${VERSION:-local}
+    depends_on:
+      - graphql-ts-hello-world

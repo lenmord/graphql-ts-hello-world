@@ -1,0 +1,66 @@
+version: 0.1.191
+name: graphql-ts-hello-world
+language: js
+type: application
+applicationType: deployment
+branch: master
+languageVersion: '14'
+hasInstall: true
+hasBuild: false
+hasTest: false
+entrypoint: npm
+installCommand: ci
+testCommand: test
+srcPaths: src
+hasCoverage: true
+coveragePaths: coverage/lcov.info
+os: alpine
+startCommand: start
+templates:
+  - docker
+  - jenkins
+  - sonarqube
+  - conductor
+  - smoke
+configs: {}
+secrets: {}
+port: 3434
+testClusters:
+  - manifests-azr.test.shared.use1
+  - manifests-dt.test.bmp
+  - manifests-shared.load.us-east-1
+  - manifests-shared.test.us-east-1
+  - manifests-swisscom.test.appuioch
+  - manifests-telstra.test.ap-south-2
+sharedTestNamespaces:
+  - default
+  - test2
+  - testcomcast
+prodClusters: []
+multiBranchDeploy: false
+testBranch: develop
+namespace: default
+hasSmoke: true
+smokeResources:
+  requests:
+    cpu: 50m
+    memory: 32Mi
+  limits:
+    cpu: 100m
+    memory: 64Mi
+resources:
+  requests:
+    cpu: 125m
+    memory: 128Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
+instanceGroup: default
+healthCheck: /health
+healthCheckDelay: 30
+hasPrometheus: false
+replicas: 2
+hasDatabase: false
+slack: '#ui-platform'
+spamSlack: '#uip-conductorbot'
+teamEmail: ui-platform@appdirect.com

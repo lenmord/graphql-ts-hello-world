@@ -1,0 +1,35 @@
+# dependencies
+node_modules
+
+# testing
+coverage
+smoke
+.scannerwork
+?
+tests?
+
+# pipeline
+.deployments
+.dockerignore
+.editorconfig
+docker-compose.yaml
+Dockerfile
+Jenkinsfile
+sonar-project.properties
+
+# git
+.github
+.gitignore
+.git
+
+# IDEs
+.vscode
+.idea
+
+
+# misc
+.DS_Store
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

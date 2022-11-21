@@ -1,0 +1,26 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint",
+    "prettier"
+  ],
+  "extends": [
+    "airbnb-typescript/base",
+    "prettier",
+    "prettier/@typescript-eslint"
+  ],
+  "parserOptions": {
+    "project": "./tsconfig.eslint.json"
+  },
+  "rules": {
+    "prettier/prettier": "error",
+    "no-unused-vars": "warn",
+    "no-console": "warn",
+    "func-names": "off",
+    "no-process-exit": "off",
+    "object-shorthand": "error",
+    "class-methods-use-this": "off",
+    "func-style": [2, "expression", { "allowArrowFunctions": true }]
+  }
+}

@@ -1,0 +1,2 @@
+namespace: testcomcast
+replicas: 2
